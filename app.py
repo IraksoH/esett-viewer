@@ -205,19 +205,13 @@ if 'esett_data' in st.session_state:
     st.caption("Times displayed in UTC+2 timezone")
 
     col5, col6, col7, col8 = st.columns(4)
-    with col5:
-        color1 = st.color_picker("Imbalance Sales Price", "#00f900")
-    with col6:
-        color2 = st.color_picker("Imbalance Purchase Price", '#A23B72')
-    with col7:
-        color3 = st.color_picker("Up Regulation Price", '#F18F01')
-    with col8:
-        color4 = st.color_picker("Down Regulation Price", '#24bf72')
     
     fig = go.Figure()
     
     # Add selected price traces
     if show_imbl_sales:
+        with col5:
+            color1 = st.color_picker("Imbalance Sales Price", "#00f900")
         fig.add_trace(go.Scatter(
             x=df['timestamp'],
             y=df['imblSalesPrice'],
@@ -227,6 +221,8 @@ if 'esett_data' in st.session_state:
         ))
     
     if show_imbl_purchase:
+        with col6:
+            color2 = st.color_picker("Imbalance Purchase Price", '#A23B72')
         fig.add_trace(go.Scatter(
             x=df['timestamp'],
             y=df['imblPurchasePrice'],
@@ -236,6 +232,8 @@ if 'esett_data' in st.session_state:
         ))
     
     if show_up_reg:
+        with col7:
+            color3 = st.color_picker("Up Regulation Price", '#F18F01')
         fig.add_trace(go.Scatter(
             x=df['timestamp'],
             y=df['upRegPrice'],
@@ -245,6 +243,8 @@ if 'esett_data' in st.session_state:
         ))
     
     if show_down_reg:
+        with col8:
+            color4 = st.color_picker("Down Regulation Price", '#24bf72')
         fig.add_trace(go.Scatter(
             x=df['timestamp'],
             y=df['downRegPrice'],
