@@ -148,6 +148,73 @@ def fetch_esett_data(start_dt: datetime, end_dt: datetime, mba: str) -> pd.DataF
     return df
 
 
+@st.cache_data(show_spinner=True)
+def fetch_volumes_data(start_dt: datetime, end_dt: datetime, mba: str) -> pd.DataFrame:
+    """
+    Fetch production volumes data from eSett OpenData API.
+    
+    Args:
+        start_dt: Start datetime
+        end_dt: End datetime
+        mba: Market Balance Area code
+        
+    Returns:
+        DataFrame with production volumes data
+    """
+    # Format dates for API (ISO 8601 format with timezone)
+    start_str = start_dt.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+    end_str = end_dt.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+    
+    # Build API URL
+    url = "https://api.opendata.esett.com/EXP16/Volumes"
+    params = {
+        "start": start_str,
+        "end": end_str,
+        "mba": mba
+    }
+    headers = {
+        "accept": "application/json"
+    }
+    
+    try:
+        # Make request
+        response = requests.get(url, params=params, headers=headers, timeout=30)
+        response.raise_for_status()
+        
+        # Parse JSON
+        data = response.json()
+        
+        # Check if data is empty
+        if not data:
+            return pd.DataFrame()
+        
+        # Convert to DataFrame
+        df = pd.DataFrame(data)
+        
+        # Parse timestamp - handle both 'timestamp' and 'timestampUTC'
+        if 'timestamp' in df.columns:
+            df['timestamp'] = pd.to_datetime(df['timestamp'], errors='coerce')
+        elif 'timestampUTC' in df.columns:
+            df['timestamp'] = pd.to_datetime(df['timestampUTC'], errors='coerce')
+        else:
+            return pd.DataFrame()
+        
+        # Convert timestamps from UTC to UTC+2
+        df['timestamp'] = df['timestamp'].dt.tz_localize('UTC').dt.tz_convert('Etc/GMT-2')
+        df['timestamp'] = df['timestamp'].dt.tz_localize(None)
+        
+        # Remove rows with invalid timestamps
+        df = df.dropna(subset=['timestamp'])
+        
+        # Sort by timestamp
+        df = df.sort_values('timestamp')
+        
+        return df
+    except Exception:
+        # Return empty DataFrame if volumes data is not available
+        return pd.DataFrame()
+
+
 # Main area
 if fetch_button:
     try:
@@ -158,6 +225,7 @@ if fetch_button:
         # Fetch data
         with st.spinner(f"Fetching data from eSett API for {mba_label}..."):
             df = fetch_esett_data(start_dt, end_dt, mba_code)
+            df_volumes = fetch_volumes_data(start_dt, end_dt, mba_code)
         
         # Check if data was returned
         if df.empty:
@@ -177,6 +245,7 @@ if fetch_button:
         
         # Store in session state
         st.session_state['esett_data'] = df
+        st.session_state['volumes_data'] = df_volumes
         st.session_state['mba_label'] = mba_label
         
     except requests.exceptions.RequestException as e:
@@ -319,6 +388,72 @@ if 'esett_data' in st.session_state:
         )
     
     st.plotly_chart(fig, use_container_width=True)
+    
+    # Production Volumes Chart (if available)
+    if 'volumes_data' in st.session_state and not st.session_state['volumes_data'].empty:
+        df_vol = st.session_state['volumes_data']
+        
+        st.subheader("Production Volumes")
+        st.caption("Stacked area chart showing production by source type")
+        
+        # Create stacked area chart
+        fig_vol = go.Figure()
+        
+        # Define production types and their colors
+        production_types = [
+            ('nuclear', 'Nuclear', '#FFB000'),
+            ('hydro', 'Hydro', '#0099CC'),
+            ('wind', 'Wind Onshore', '#66CC99'),
+            ('windOffshore', 'Wind Offshore', '#009966'),
+            ('solar', 'Solar', '#FFCC00'),
+            ('thermal', 'Thermal', '#CC6600'),
+            ('energyStorage', 'Energy Storage', '#9966CC'),
+            ('other', 'Other', '#999999')
+        ]
+        
+        # Add traces for each production type
+        for col, name, color in production_types:
+            if col in df_vol.columns:
+                fig_vol.add_trace(go.Scatter(
+                    x=df_vol['timestamp'],
+                    y=df_vol[col],
+                    mode='lines',
+                    name=name,
+                    line=dict(width=0.5, color=color),
+                    stackgroup='one',
+                    fillcolor=color
+                ))
+        
+        # Update layout
+        fig_vol.update_layout(
+            title=f"Production Volumes - {mba_label}",
+            xaxis_title="Time (UTC+2)",
+            yaxis_title="Production (MWh)",
+            hovermode='x unified',
+            height=500,
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.02,
+                xanchor="right",
+                x=1
+            ),
+            plot_bgcolor='white',
+            xaxis=dict(
+                showgrid=True,
+                gridcolor='lightgray',
+                showline=True,
+                linecolor='gray'
+            ),
+            yaxis=dict(
+                showgrid=True,
+                gridcolor='lightgray',
+                showline=True,
+                linecolor='gray'
+            )
+        )
+        
+        st.plotly_chart(fig_vol, use_container_width=True)
     
     # Data table
     st.subheader("Raw Data")
