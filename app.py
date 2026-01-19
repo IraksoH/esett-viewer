@@ -216,7 +216,7 @@ if 'esett_data' in st.session_state:
             y=df['imblSalesPrice'],
             mode='lines',
             name='Imbalance Sales Price',
-            line=dict(color='#2E86AB', width=2)
+            line=dict(color='color1, width=2)
         ))
     
     if show_imbl_purchase:
