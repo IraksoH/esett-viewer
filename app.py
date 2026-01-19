@@ -206,8 +206,19 @@ if 'esett_data' in st.session_state:
     
     fig = go.Figure()
 
-    color1 = st.color_picker("Pick A Color", "#00f900")
-    st.write("The current color is", color1)
+    col5, col6, col7, col8 = st.columns(4)
+    with col5:
+        color1 = st.color_picker("Imbalance Sales Price", "#00f900")
+        st.write("The current color is", color1)
+    with col6:
+        color2 = st.color_picker("Imbalance Purchase Price", '#A23B72')
+        st.write("The current color is", color2)
+    with col7:
+        color3 = st.color_picker("Up Regulation Price", '#F18F01')
+        st.write("The current color is", color3)
+    with col8:
+        color4 = st.color_picker("Down Regulation Price", '#24bf72')
+        st.write("The current color is", color4)
     
     # Add selected price traces
     if show_imbl_sales:
