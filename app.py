@@ -207,7 +207,7 @@ if 'esett_data' in st.session_state:
     fig = go.Figure()
 
     color1 = st.color_picker("Pick A Color", "#00f900")
-    st.write("The current color is", color)
+    st.write("The current color is", color1)
     
     # Add selected price traces
     if show_imbl_sales:
