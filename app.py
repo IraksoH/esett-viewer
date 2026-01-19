@@ -259,12 +259,12 @@ if 'esett_data' in st.session_state:
         ))
     
     if show_spot_diff:
-        fig.add_trace(go.Scatter(
+        fig.add_trace(go.Bar(
             x=df['timestamp'],
             y=df['imblSpotDifferencePrice'],
-            mode='bars',
             name='Spread vs Spot Price',
-            line=dict(color='#6A994E', width=2)
+            marker=dict(color='rgba(128, 128, 128, 0.5)'),
+            yaxis='y2'
         ))
     
     if show_main_dir:
