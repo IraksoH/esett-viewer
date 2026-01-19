@@ -263,7 +263,7 @@ if 'esett_data' in st.session_state:
             x=df['timestamp'],
             y=df['imblSpotDifferencePrice'],
             name='Spread vs Spot Price',
-            marker=dict(color='rgba(128, 128, 128, 0.5)'),
+            marker=dict(color=color5, opacity=0.6),
             yaxis='y2'
         ))
     
@@ -307,17 +307,37 @@ if 'esett_data' in st.session_state:
         )
     )
     
-    # Add secondary y-axis for main direction if displayed
-    if show_main_dir:
+    # Add secondary y-axis configuration
+    if show_spot_diff or show_main_dir:
+        # Determine appropriate title based on what's being shown
+        y2_title = ""
+        if show_spot_diff and show_main_dir:
+            y2_title = "Spot Difference (€/MWh) / Direction"
+        elif show_spot_diff:
+            y2_title = "Spot Difference (€/MWh)"
+        elif show_main_dir:
+            y2_title = "Direction (-1=Down, 0=Neutral, 1=Up)"
+        
         fig.update_layout(
             yaxis2=dict(
-                title="Direction (-1=Down, 0=Neutral, 1=Up)",
+                title=y2_title,
                 overlaying='y',
                 side='right',
-                showgrid=False,
-                range=[-1.5, 1.5]
+                showgrid=False
             )
         )
+        
+        # If only showing main direction, constrain its range
+        if show_main_dir and not show_spot_diff:
+            fig.update_layout(
+                yaxis2=dict(
+                    title=y2_title,
+                    overlaying='y',
+                    side='right',
+                    showgrid=False,
+                    range=[-1.5, 1.5]
+                )
+            )
     
     st.plotly_chart(fig, use_container_width=True)
     
