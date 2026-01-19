@@ -262,8 +262,8 @@ if 'esett_data' in st.session_state:
         fig.add_trace(go.Scatter(
             x=df['timestamp'],
             y=df['imblSpotDifferencePrice'],
-            mode='lines',
-            name='Imbalance Spot Difference',
+            mode='bars',
+            name='Spread vs Spot Price',
             line=dict(color='#6A994E', width=2)
         ))
     
