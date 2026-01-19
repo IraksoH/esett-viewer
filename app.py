@@ -203,6 +203,16 @@ if 'esett_data' in st.session_state:
     # Create interactive chart
     st.subheader("Price Time Series")
     st.caption("Times displayed in UTC+2 timezone")
+
+    col5, col6, col7, col8 = st.columns(4)
+    with col5:
+        color1 = st.color_picker("Imbalance Sales Price", "#00f900")
+    with col6:
+        color2 = st.color_picker("Imbalance Purchase Price", '#A23B72')
+    with col7:
+        color3 = st.color_picker("Up Regulation Price", '#F18F01')
+    with col8:
+        color4 = st.color_picker("Down Regulation Price", '#24bf72')
     
     fig = go.Figure()
     
@@ -222,7 +232,7 @@ if 'esett_data' in st.session_state:
             y=df['imblPurchasePrice'],
             mode='lines',
             name='Imbalance Purchase Price',
-            line=dict(color='#A23B72', width=2)
+            line=dict(color=color2, width=2)
         ))
     
     if show_up_reg:
@@ -231,7 +241,7 @@ if 'esett_data' in st.session_state:
             y=df['upRegPrice'],
             mode='lines',
             name='Up Regulation Price',
-            line=dict(color='#F18F01', width=2)
+            line=dict(color=color3, width=2)
         ))
     
     if show_down_reg:
@@ -240,7 +250,7 @@ if 'esett_data' in st.session_state:
             y=df['downRegPrice'],
             mode='lines',
             name='Down Regulation Price',
-            line=dict(color='#24bf72', width=2)
+            line=dict(color=color4, width=2)
         ))
     
     if show_spot_diff:
@@ -305,20 +315,6 @@ if 'esett_data' in st.session_state:
         )
     
     st.plotly_chart(fig, use_container_width=True)
-
-    col5, col6, col7, col8 = st.columns(4)
-    with col5:
-        color1 = st.color_picker("Imbalance Sales Price", "#00f900")
-        st.write("The current color is", color1)
-    with col6:
-        color2 = st.color_picker("Imbalance Purchase Price", '#A23B72')
-        st.write("The current color is", color2)
-    with col7:
-        color3 = st.color_picker("Up Regulation Price", '#F18F01')
-        st.write("The current color is", color3)
-    with col8:
-        color4 = st.color_picker("Down Regulation Price", '#24bf72')
-        st.write("The current color is", color4)
     
     # Data table
     st.subheader("Raw Data")
