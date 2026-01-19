@@ -62,6 +62,19 @@ with st.sidebar:
     show_up_reg = st.checkbox("Up Regulation Price", value=True)
     show_down_reg = st.checkbox("Down Regulation Price", value=True)
     show_spot_diff = st.checkbox("Imbalance Spot Difference", value=False)
+
+    st.subheader("Line Colors")
+    with st.container():
+        if show_imbl_sales:
+            color1 = st.color_picker("Imbalance Sales Price", "#00f900")
+        if show_imbl_purchase:
+            color2 = st.color_picker("Imbalance Purchase Price", '#A23B72')
+        if show_up_reg:
+            color3 = st.color_picker("Up Regulation Price", '#F18F01')
+        if show_down_reg:
+            color4 = st.color_picker("Down Regulation Price", '#24bf72')
+        if show_spot_diff:
+            color5 = st.color_picker("Imbalance Spot Difference", '#6A994E')
     
     st.subheader("Additional Data")
     show_main_dir = st.checkbox("Main Direction Regulation Power", value=False)
@@ -210,8 +223,6 @@ if 'esett_data' in st.session_state:
     
     # Add selected price traces
     if show_imbl_sales:
-        with col5:
-            color1 = st.color_picker("Imbalance Sales Price", "#00f900")
         fig.add_trace(go.Scatter(
             x=df['timestamp'],
             y=df['imblSalesPrice'],
@@ -221,8 +232,6 @@ if 'esett_data' in st.session_state:
         ))
     
     if show_imbl_purchase:
-        with col6:
-            color2 = st.color_picker("Imbalance Purchase Price", '#A23B72')
         fig.add_trace(go.Scatter(
             x=df['timestamp'],
             y=df['imblPurchasePrice'],
@@ -232,8 +241,6 @@ if 'esett_data' in st.session_state:
         ))
     
     if show_up_reg:
-        with col7:
-            color3 = st.color_picker("Up Regulation Price", '#F18F01')
         fig.add_trace(go.Scatter(
             x=df['timestamp'],
             y=df['upRegPrice'],
@@ -243,8 +250,6 @@ if 'esett_data' in st.session_state:
         ))
     
     if show_down_reg:
-        with col8:
-            color4 = st.color_picker("Down Regulation Price", '#24bf72')
         fig.add_trace(go.Scatter(
             x=df['timestamp'],
             y=df['downRegPrice'],
